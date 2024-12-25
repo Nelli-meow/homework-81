@@ -19,13 +19,18 @@ linksRouter.get('/:shortUrl', async (req, res) => {
 
         const link = await Link.findOne({ shortUrl });
 
+        console.log(shortUrl);
+
         if (!link) {
             res.status(404).send('not found');
+            return;
         }
 
-        res.status(301).redirect("links id");
+        res.status(301).redirect(link.originalUrl);
+
     } catch (error) {
         console.log(error);
+        res.status(500).send('Server Error');
     }
 });
 
@@ -39,21 +44,22 @@ linksRouter.post('/', async (req, res) => {
         }
 
         const abc = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        let wordForLink = '';
+        let shortWordForLink = '';
 
         for (let i = 0; i < 7; i++) {
-            wordForLink += abc[Math.floor(Math.random() * abc.length)];
+            shortWordForLink += abc[Math.floor(Math.random() * abc.length)];
         }
 
         const newLink: ILinkSWithoutID = {
-            originalUrl: req.body.originalUrl,
-            shortUrl: wordForLink,
+            originalUrl: originalUrl,
+            shortUrl: shortWordForLink,
         };
 
         try{
             const link = new Link(newLink);
             await link.save();
-            res.send(link);
+
+            res.status(200).send(link);
         } catch (e) {
             console.error(e);
         }
