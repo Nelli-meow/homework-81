@@ -4,6 +4,21 @@ import {ILinkSWithoutID} from "../types";
 
 const linksRouter = express.Router();
 
+const getUniqueShortUrl = async () => {
+    const abc = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let shortUrl = '';
+    for (let i = 0; i < 7; i++) {
+        shortUrl += abc[Math.floor(Math.random() * abc.length)];
+    }
+
+    const existingLink = await Link.findOne({ shortUrl });
+    if (existingLink) {
+        return getUniqueShortUrl();
+    }
+
+    return shortUrl;
+};
+
 linksRouter.get('/', async (req, res) => {
     try {
         const links = await Link.find();
@@ -18,8 +33,6 @@ linksRouter.get('/:shortUrl', async (req, res) => {
         const { shortUrl } = req.params;
 
         const link = await Link.findOne({ shortUrl });
-
-        console.log(shortUrl);
 
         if (!link) {
             res.status(404).send('not found');
@@ -43,16 +56,11 @@ linksRouter.post('/', async (req, res) => {
             res.status(404).send('link not found');
         }
 
-        const abc = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        let shortWordForLink = '';
-
-        for (let i = 0; i < 7; i++) {
-            shortWordForLink += abc[Math.floor(Math.random() * abc.length)];
-        }
+        const shortUrl = await getUniqueShortUrl();
 
         const newLink: ILinkSWithoutID = {
             originalUrl: originalUrl,
-            shortUrl: shortWordForLink,
+            shortUrl: shortUrl,
         };
 
         try{
