@@ -13,7 +13,7 @@ const FormLInks = () => {
     e.preventDefault();
 
     if (!link.link) {
-      alert('Please enter title and content');
+      alert('Please enter link');
       return;
     }
 
