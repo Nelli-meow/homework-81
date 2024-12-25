@@ -20,7 +20,7 @@ linksRouter.get('/:shortUrl', async (req, res) => {
         const link = await Link.findOne({ shortUrl });
 
         if (!link) {
-            res.status(404).send(link);
+            res.status(404).send('not found');
         }
 
         res.status(301).redirect("links id");
@@ -38,9 +38,16 @@ linksRouter.post('/', async (req, res) => {
             res.status(404).send('link not found');
         }
 
+        const abc = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let wordForLink = '';
+
+        for (let i = 0; i < 7; i++) {
+            wordForLink += abc[Math.floor(Math.random() * abc.length)];
+        }
+
         const newLink: ILinkSWithoutID = {
             originalUrl: req.body.originalUrl,
-            shortUrl: req.body.originalUrl,
+            shortUrl: wordForLink,
         };
 
         try{
