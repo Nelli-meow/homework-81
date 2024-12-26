@@ -1,23 +1,40 @@
 import { useCallback, useState } from 'react';
 import * as React from 'react';
-import { LinksProps } from '../../types';
+import {  ILinkSWithoutID } from '../types';
+import axiosApi from '../axiosApi.ts';
 
-const initialState = {
-  link: ''
+
+interface Props {
+  onSubmit: (shortUrl: ILinkSWithoutID) => void;
 }
 
-const FormLInks = () => {
-  const [link, setLink] = useState<LinksProps>(initialState);
+const initialState = {
+  originalUrl: '',
+  shortUrl: '',
+};
+
+const FormLInks: React.FC<Props> = ({onSubmit}) => {
+  const [link, setLink] = useState(initialState);
 
   const submitLink = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!link.link) {
+    if (!link.originalUrl) {
       alert('Please enter link');
       return;
     }
 
-    console.log(link);
+    onSubmit(link);
+
+    const response = await axiosApi.post('/links', {
+      originalUrl: link.originalUrl,
+    });
+
+    if (response.data) {
+      onSubmit(response.data);
+    } else {
+      console.error('Failed to shorten the link');
+    }
 
     setLink(initialState);
   };
@@ -38,8 +55,8 @@ const FormLInks = () => {
       <form onSubmit={submitLink}>
         <div className="input-group mb-3">
           <input
-            value={link.link}
-            name="link"
+            value={link.originalUrl}
+            name="originalUrl"
             onChange={inputChangeHandler}
             type="text"
             className="form-control"
