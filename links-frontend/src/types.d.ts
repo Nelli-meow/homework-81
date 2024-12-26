@@ -1,4 +1,4 @@
 export interface ILinkSWithoutID {
-    shortUrl: string;
-    originalUrl: string;
+  shortUrl: string;
+  originalUrl: string;
 }
